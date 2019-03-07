@@ -1,1 +1,1 @@
- Webgl-boilerplate for Graphics Spring 2019
+Graphics 3rd Assignment
