@@ -7,7 +7,7 @@ main();
 //
 
 var c;
-var c1;
+var player1;
 var lane1;
 var lane2;
 var lane3;
@@ -20,11 +20,15 @@ function main() {
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
   c = new cube(gl, [0, 0, 0]);
-  c1 = new player(gl, [0, 0, 0]);
+  player1 = new player(gl, [0, 0, 0]);
   lane1 = new lane(gl, [10, 0, 1.5]);
   lane2 = new lane(gl, [10, 0, 1]);
   lane3 = new lane(gl, [10, 0, -1]);
   lane4 = new lane(gl, [10, 0, -1.5]);
+  player1.pos[1] = lane3.pos[1] + 1;
+  player1.pos[2] = lane3.pos[2] + 1 
+  
+
   // If we don't have a GL context, give up now
 
   if (!gl) {
@@ -102,35 +106,58 @@ function main() {
 // Draw the scene.
 //
 
+
 document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
-  if (event.keyCode == 38) {
-    //alert('hi');
-    for (var key in models) {
-      var model = models[key];
-      if (model['name'] == 'fish') {
-        zposx += 0.1;
-        zposz += 0.1;
-
-        cpos += 0.1;
-      }
+  if (event.keyCode == 32) {
+     if (player1.pos[1] === lane1.pos[1] + 0.5 && player1.pos[2] === lane1.pos[2] + 0.5) {
+      player1.left = "true";
+      player1.right = "false";
     }
-  }
-  if (event.keyCode == 38) {
-    //alert('hi');
-    for (var key in models) {
-      var model = models[key];
-      if (model['name'] == 'fish') {
-        zposx += 0.1;
-        zposz += 0.1;
-
-        cpos += 0.1;
-      }
+    if (player1.pos[1] === lane3.pos[1] + 1 && player1.pos[2] === lane3.pos[2] + 1) {
+      player1.left = "false";
+      player1.right = "true";
     }
-  }
-  if (event.keyCode == 38) {
-    cpos += 0.1;
+    
+    if (player1.right == "false") {
+      console.log("lane1");
+      console.log(lane1.pos);
+      console.log("lane2");
+      console.log(lane2.pos);
+      console.log("lane3");
+      console.log(lane3.pos);
+      console.log("lane4");
+      console.log(lane4.pos);
+      console.log("player");
+      console.log(player1.pos);
+      player1.pos[1] = lane3.pos[1] + 1;
+      player1.pos[2] = lane3.pos[2] + 1;
+      console.log("player");
+      console.log(player1.pos);
+      player1.left = "false";
+      player1.right = "true";
+    }
+    
+    else //if (player1.right == "true") {
+      {console.log("lane1");
+      console.log(lane1.pos);
+      console.log("lane2");
+      console.log(lane2.pos);
+      console.log("lane3");
+      console.log(lane3.pos);
+      console.log("lane4");
+      console.log(lane4.pos);
+      console.log("player");
+      console.log(player1.pos);
+      player1.pos[1] = lane1.pos[1] + 0.5;
+      player1.pos[2] = lane1.pos[2] + 0.5;
+      console.log("player");
+      console.log(player1.pos);
+      player1.left = "true";
+      player1.right = "false";
+    }
+
   }
 
 }
@@ -189,7 +216,7 @@ function drawScene(gl, programInfo, deltaTime) {
   mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
   //c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
-  c1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
+  player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane1.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane2.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane3.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);

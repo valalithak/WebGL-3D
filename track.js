@@ -38,7 +38,7 @@ let lane = class {
              0.1, - 0.1, 1.0,
         ];
 
-        this.rotation = 40 ;
+        this.rotation = 40;
 
         this.pos = pos;
 
