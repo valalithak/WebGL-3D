@@ -10,6 +10,8 @@ var c;
 var c1;
 var lane1;
 var lane2;
+var lane3;
+var lane4;
 
 function main() {
 
@@ -19,8 +21,10 @@ function main() {
 
   c = new cube(gl, [0, 0, 0]);
   c1 = new player(gl, [0, 0, 0]);
-  lane1 = new lane(gl, [10, 0, -3]);
+  lane1 = new lane(gl, [10, 0, 1.5]);
   lane2 = new lane(gl, [10, 0, 1]);
+  lane3 = new lane(gl, [10, 0, -1]);
+  lane4 = new lane(gl, [10, 0, -1.5]);
   // If we don't have a GL context, give up now
 
   if (!gl) {
@@ -188,6 +192,8 @@ function drawScene(gl, programInfo, deltaTime) {
   c1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane1.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane2.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+  lane3.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+  lane4.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
 
 }
 
