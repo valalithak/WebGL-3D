@@ -1,21 +1,25 @@
 var cubeRotation = 0.0;
 
+var c;
+var c1;
+var road;
+var road_texture;
+var wall_left;
+var wall_right;
+var wall_texturel
+var player1;
+var player_texture;
+
+var c_texture;
+var cam_x = 0, cam_y = 20, cam_z = 10;
+
 main();
 
 //
 // Start here
 //
 
-var c;
-var player1;
-var lane1;
-var lane2;
-var lane3;
-var lane4;
-var cpos0 = 2;
-var cpos1 = 5;
-var cpos2 = 0;
-var near = 0.1;
+
 
 function main() {
 
@@ -23,15 +27,15 @@ function main() {
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
-  c = new cube(gl, [0, 2, 0]);
-
-  lane1 = new lane(gl, [10, 0, 1.5]);
-  lane2 = new lane(gl, [10, 0, 1]);
-  lane3 = new lane(gl, [10, 0, -1]);
-  lane4 = new lane(gl, [10, 0, -1.5]);
-  player1 = new player(gl, [0, 2, 0]);
-  //player1.pos[1] = lane3.pos[1] + 1;
-  //player1.pos[2] = lane3.pos[2] + 1 
+  c = new cube(gl, [2, 2, 4]);
+  player1 = new player(gl, [0, -3, 0]);
+  track = new Array()
+  var i = 0;
+  while (i < 1000) {
+    lane1 = new lane(gl, [0, -4, -i]);
+    track.push(lane1)
+    i++;
+  }
 
 
   // If we don't have a GL context, give up now
@@ -45,26 +49,28 @@ function main() {
 
   const vsSource = `
     attribute vec4 aVertexPosition;
-    attribute vec4 aVertexColor;
+    attribute vec2 aTextureCoord;
 
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
-    varying lowp vec4 vColor;
+    varying highp vec2 vTextureCoord;
 
     void main(void) {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vColor = aVertexColor;
+      vTextureCoord = aTextureCoord;
     }
   `;
 
   // Fragment shader program
 
   const fsSource = `
-    varying lowp vec4 vColor;
+    varying highp vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
 
     void main(void) {
-      gl_FragColor = vColor;
+      gl_FragColor = texture2D(uSampler, vTextureCoord);
     }
   `;
 
@@ -72,6 +78,10 @@ function main() {
   // for the vertices and so forth is established.
   const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
+  // Load texture
+  c_texture = loadTexture(gl, 'road.jpg');
+  player_texture = loadTexture(gl, 'orange.jpg');
+  lane_texture = loadTexture(gl, 'road.jpg');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -80,11 +90,12 @@ function main() {
     program: shaderProgram,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+      textureCoord: gl.getAttribLocation(shaderProgram, 'aTextureCoord'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
     },
   };
 
@@ -99,14 +110,12 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    // this moves the player front
-    player1.pos[0] -= 0.02;
-    cpos0 -= 0.02;
-    if (player1.pos[1] > 2) {
-      player1.pos[1] -= 0.1;
+    if (player1.pos[1] > -3) {
+      player1.pos[1] -= 0.4;
     }
-    
-
+    player1.pos[2] -= 0.5;
+    cam_z -= 0.5;
+    console.log(player1.pos[2]);
     drawScene(gl, programInfo, deltaTime);
 
     requestAnimationFrame(render);
@@ -114,66 +123,29 @@ function main() {
   requestAnimationFrame(render);
 }
 
-//
-// Draw the scene.
-//
-
-
 document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
-  if (event.keyCode == 39) {
+  // if (event.keyCode == 39) {
+  //   player1.pos[2] = (lane3.pos[2] + lane4.pos[2]) / 2;
+  //   player1.left = "false";
+  //   player1.right = "true";
 
-    // //console.log("lane1");
-    // //console.log(lane1.pos);
-    // console.log("lane2");
-    // console.log(lane2.pos);
-    // console.log("lane3");
-    // console.log(lane3.pos);
-    // console.log("lane4");
-    // console.log(lane4.pos);
-    // console.log("player");
-    // console.log(player1.pos);
-    //player1.pos[1] = lane3.pos[1]-0.6;
-    player1.pos[2] = (lane3.pos[2] + lane4.pos[2]) / 2;
-    // console.log("player");
-    // console.log(player1.pos);
-    player1.left = "false";
-    player1.right = "true";
-
-  }
-  if (event.keyCode == 37) {
-
-    // console.log("lane1");
-    // console.log(lane1.pos);
-    // console.log("lane2");
-    // console.log(lane2.pos);
-    // console.log("lane3");
-    // console.log(lane3.pos);
-    // console.log("lane4");
-    // console.log(lane4.pos);
-    // console.log("player");
-    // console.log(player1.pos);
-    //player1.pos[1] = lane1.pos[1] - 0.2;
-    player1.pos[2] = (lane1.pos[2] - lane2.pos[2]) + 0.1;
-    // console.log("player");
-    // console.log(player1.pos);
-    player1.left = "true";
-    player1.right = "false";
-  }
+  // }
+  // if (event.keyCode == 37) {
+  //   player1.pos[2] = (lane1.pos[2] - lane2.pos[2]) + 0.1;
+  //   player1.left = "true";
+  //   player1.right = "false";
+  // }
   if (event.keyCode == 32) {
     player1.pos[1] += 1;
-  }
-  if (event.keyCode == 40) {
-
-
-    player1.pos[1] -= 1
 
   }
-
 
 }
-
+//
+// Draw the scene.
+//
 function drawScene(gl, programInfo, deltaTime) {
   gl.clearColor(1, 1, 1, 1.0);  // Clear to black, fully opaque
   gl.clearDepth(1.0);                 // Clear everything
@@ -191,10 +163,10 @@ function drawScene(gl, programInfo, deltaTime) {
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  const fieldOfView = 90 * Math.PI / 180;   // in radians
+  const fieldOfView = 45 * Math.PI / 180;   // in radians
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-   var zNear = near;
-  var zFar =  near +1000;
+  const zNear = 0.1;
+  const zFar = 100.0;
   const projectionMatrix = mat4.create();
 
   // note: glmatrix.js always has the first argument
@@ -208,22 +180,15 @@ function drawScene(gl, programInfo, deltaTime) {
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
   var cameraMatrix = mat4.create();
-  mat4.translate(cameraMatrix, cameraMatrix, [cpos0, cpos1, cpos2]);
+  mat4.translate(cameraMatrix, cameraMatrix, [0, 0, cam_z]);
   var cameraPosition = [
     cameraMatrix[12],
     cameraMatrix[13],
     cameraMatrix[14],
   ];
-  console.log("camera");
-  console.log(cpos0);
-
-  cpos0 =  cameraMatrix[12];
-  cpos1 =  cameraMatrix[13];
-  cpos2 =  cameraMatrix[14];
-
   var up = [0, 1, 0];
 
-  mat4.lookAt(cameraMatrix, cameraPosition, player1.pos, up);
+  mat4.lookAt(cameraMatrix, cameraPosition, [0, 0, cam_z - 10], up);
 
   var viewMatrix = cameraMatrix;//mat4.create();
 
@@ -233,13 +198,13 @@ function drawScene(gl, programInfo, deltaTime) {
 
   mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
-  c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
-
-  lane1.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
-  lane2.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
-  lane3.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
-  lane4.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+  //c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
   player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
+  var j = 0;
+  while (j < 1000) {
+    track[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
 }
 
 //
@@ -265,6 +230,61 @@ function initShaderProgram(gl, vsSource, fsSource) {
 
   return shaderProgram;
 }
+
+//
+// Initialize a texture and load an image.
+// When the image finished loading copy it into the texture.
+//
+function loadTexture(gl, url) {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Because images have to be download over the internet
+  // they might take a moment until they are ready.
+  // Until then put a single pixel in the texture so we can
+  // use it immediately. When the image has finished downloading
+  // we'll update the texture with the contents of the image.
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const width = 1;
+  const height = 1;
+  const border = 0;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+  const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+    width, height, border, srcFormat, srcType,
+    pixel);
+
+  const image = new Image();
+  image.onload = function () {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+      srcFormat, srcType, image);
+
+    // WebGL1 has different requirements for power of 2 images
+    // vs non power of 2 images so check if the image is a
+    // power of 2 in both dimensions.
+    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+      // Yes, it's a power of 2. Generate mips.
+      gl.generateMipmap(gl.TEXTURE_2D);
+    } else {
+      // No, it's not a power of 2. Turn off mips and set
+      // wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
+  };
+  image.src = url;
+
+  return texture;
+}
+
+function isPowerOf2(value) {
+  return (value & (value - 1)) == 0;
+}
+
 
 //
 // creates a shader of the given type, uploads the source and

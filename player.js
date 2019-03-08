@@ -6,36 +6,36 @@ let player = class {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
         this.positions = [
-             // Front face
-             -0.25, -0.5, 0.25,
-             0.25, -0.5, 0.25,
-             0.25, 0.5, 0.25,
-             -0.25, 0.5, 0.25,
-             //Back Face
-             -0.25, -0.5, -0.25,
-             0.25, -0.5, -0.25,
-             0.25, 0.5, -0.25,
-             -0.25, 0.5, -0.25,
-             //Top Face
-             -0.25, 0.5, -0.25,
-             0.25, 0.5, -0.25,
-             0.25, 0.5, 0.25,
-             -0.25, 0.5, 0.25,
-             //Bottom Face
-             -0.25, -0.5, -0.25,
-             0.25, -0.5, -0.25,
-             0.25, -0.5, 0.25,
-             -0.25, -0.5, 0.25,
-             //Left Face
-             -0.25, -0.5, -0.25,
-             -0.25, 0.5, -0.25,
-             -0.25, 0.5, 0.25,
-             -0.25, -0.5, 0.25,
-             //Right Face
-             0.25, -0.5, -0.25,
-             0.25, 0.5, -0.25,
-             0.25, 0.5, 0.25,
-             0.25, -0.5, 0.25,
+            // Front face
+            -0.25, -0.5, 0.25,
+            0.25, -0.5, 0.25,
+            0.25, 0.5, 0.25,
+            -0.25, 0.5, 0.25,
+            //Back Face
+            -0.25, -0.5, -0.25,
+            0.25, -0.5, -0.25,
+            0.25, 0.5, -0.25,
+            -0.25, 0.5, -0.25,
+            //Top Face
+            -0.25, 0.5, -0.25,
+            0.25, 0.5, -0.25,
+            0.25, 0.5, 0.25,
+            -0.25, 0.5, 0.25,
+            //Bottom Face
+            -0.25, -0.5, -0.25,
+            0.25, -0.5, -0.25,
+            0.25, -0.5, 0.25,
+            -0.25, -0.5, 0.25,
+            //Left Face
+            -0.25, -0.5, -0.25,
+            -0.25, 0.5, -0.25,
+            -0.25, 0.5, 0.25,
+            -0.25, -0.5, 0.25,
+            //Right Face
+            0.25, -0.5, -0.25,
+            0.25, 0.5, -0.25,
+            0.25, 0.5, 0.25,
+            0.25, -0.5, 0.25,
         ];
 
         this.rotation = 0;
@@ -43,14 +43,14 @@ let player = class {
         this.pos = pos;
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positions), gl.STATIC_DRAW);
-        
+
         this.faceColors = [ // orange 
-            [1, 0.64, 0, 1],    
-            [1, 0.64, 0, 1], 
-            [1, 0.54, 0, 1], 
-            [1, 0.64, 0, 1], 
-            [1, 0.64, 0, 1], 
-            [1, 0.64, 0, 1], 
+            [1, 0.64, 0, 1],
+            [1, 0.64, 0, 1],
+            [1, 0.54, 0, 1],
+            [1, 0.64, 0, 1],
+            [1, 0.64, 0, 1],
+            [1, 0.64, 0, 1],
 
         ];
 
@@ -78,14 +78,54 @@ let player = class {
         // This array defines each face as two triangles, using the
         // indices into the vertex array to specify each triangle's
         // position.
+        const textureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+
+        const textureCoordinates = [
+            // Front
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            // Back
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            // Top
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            // Bottom
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            // Right
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+            // Left
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0,
+        ];
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+            gl.STATIC_DRAW);
+
+
 
         const indices = [
-            0, 1, 2,    0, 2, 3, // front
-            4, 5, 6,    4, 6, 7,
-            8, 9, 10,   8, 10, 11,
+            0, 1, 2, 0, 2, 3, // front
+            4, 5, 6, 4, 6, 7,
+            8, 9, 10, 8, 10, 11,
             12, 13, 14, 12, 14, 15,
             16, 17, 18, 16, 18, 19,
-            20, 21, 22, 20, 22, 23, 
+            20, 21, 22, 20, 22, 23,
         ];
 
         // Now send the element array to GL
@@ -95,7 +135,8 @@ let player = class {
 
         this.buffer = {
             position: this.positionBuffer,
-            color: colorBuffer,
+            // color: colorBuffer,
+            textureCoord: textureCoordBuffer,
             indices: indexBuffer,
         }
 
@@ -108,7 +149,7 @@ let player = class {
             modelViewMatrix,
             this.pos
         );
-        
+
         //this.pos  = 0.1//Math.PI / (((Math.random()) % 100) + 50);
 
         mat4.rotate(modelViewMatrix,
@@ -133,26 +174,27 @@ let player = class {
             gl.enableVertexAttribArray(
                 programInfo.attribLocations.vertexPosition);
         }
-
-        // Tell WebGL how to pull out the colors from the color buffer
-        // into the vertexColor attribute.
         {
-            const numComponents = 4;
+            const numComponents = 2;
             const type = gl.FLOAT;
             const normalize = false;
             const stride = 0;
             const offset = 0;
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.color);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.textureCoord);
             gl.vertexAttribPointer(
-                programInfo.attribLocations.vertexColor,
+                programInfo.attribLocations.textureCoord,
                 numComponents,
                 type,
                 normalize,
                 stride,
                 offset);
             gl.enableVertexAttribArray(
-                programInfo.attribLocations.vertexColor);
+                programInfo.attribLocations.textureCoord);
         }
+
+        // Tell WebGL how to pull out the colors from the color buffer
+        // into the vertexColor attribute.
+
 
         // Tell WebGL which indices to use to index the vertices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer.indices);
@@ -171,7 +213,14 @@ let player = class {
             programInfo.uniformLocations.modelViewMatrix,
             false,
             modelViewMatrix);
+        gl.activeTexture(gl.TEXTURE0);
 
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, player_texture);
+
+        // Tell the shader we bound the texture to texture unit 0
+
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
         {
             const vertexCount = 36;
             const type = gl.UNSIGNED_SHORT;
