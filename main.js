@@ -12,6 +12,10 @@ var lane1;
 var lane2;
 var lane3;
 var lane4;
+var cpos0 = 2;
+var cpos1 = 5;
+var cpos2 = 0;
+var near = 0.1;
 
 function main() {
 
@@ -19,8 +23,8 @@ function main() {
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
-  c = new cube(gl, [0, 0, 0]);
-  
+  c = new cube(gl, [0, 2, 0]);
+
   lane1 = new lane(gl, [10, 0, 1.5]);
   lane2 = new lane(gl, [10, 0, 1]);
   lane3 = new lane(gl, [10, 0, -1]);
@@ -28,7 +32,7 @@ function main() {
   player1 = new player(gl, [0, 2, 0]);
   //player1.pos[1] = lane3.pos[1] + 1;
   //player1.pos[2] = lane3.pos[2] + 1 
-  
+
 
   // If we don't have a GL context, give up now
 
@@ -96,12 +100,13 @@ function main() {
     const deltaTime = now - then;
     then = now;
     // this moves the player front
-    //player1.pos[0] -= 0.02;
-    // cameraMatrix[12] += 0.02;
-    if(player1.pos[1] > 2)
-    {
+    player1.pos[0] -= 0.02;
+    cpos0 -= 0.02;
+    if (player1.pos[1] > 2) {
       player1.pos[1] -= 0.1;
     }
+    
+
     drawScene(gl, programInfo, deltaTime);
 
     requestAnimationFrame(render);
@@ -117,55 +122,55 @@ function main() {
 document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
-    if(event.keyCode == 39){
-   
-      console.log("lane1");
-      console.log(lane1.pos);
-      console.log("lane2");
-      console.log(lane2.pos);
-      console.log("lane3");
-      console.log(lane3.pos);
-      console.log("lane4");
-      console.log(lane4.pos);
-      console.log("player");
-      console.log(player1.pos);
-      //player1.pos[1] = lane3.pos[1]-0.6;
-      player1.pos[2] = (lane3.pos[2] + lane4.pos[2])/2;
-      console.log("player");
-      console.log(player1.pos);
-      player1.left = "false";
-      player1.right = "true";
-    
+  if (event.keyCode == 39) {
+
+    // //console.log("lane1");
+    // //console.log(lane1.pos);
+    // console.log("lane2");
+    // console.log(lane2.pos);
+    // console.log("lane3");
+    // console.log(lane3.pos);
+    // console.log("lane4");
+    // console.log(lane4.pos);
+    // console.log("player");
+    // console.log(player1.pos);
+    //player1.pos[1] = lane3.pos[1]-0.6;
+    player1.pos[2] = (lane3.pos[2] + lane4.pos[2]) / 2;
+    // console.log("player");
+    // console.log(player1.pos);
+    player1.left = "false";
+    player1.right = "true";
+
   }
-    if(event.keyCode==37){
-    
-      console.log("lane1");
-      console.log(lane1.pos);
-      console.log("lane2");
-      console.log(lane2.pos);
-      console.log("lane3");
-      console.log(lane3.pos);
-      console.log("lane4");
-      console.log(lane4.pos);
-      console.log("player");
-      console.log(player1.pos);
-      //player1.pos[1] = lane1.pos[1] - 0.2;
-      player1.pos[2] = (lane1.pos[2] - lane2.pos[2]) +0.1;
-      console.log("player");
-      console.log(player1.pos);
-      player1.left = "true";
-      player1.right = "false";
+  if (event.keyCode == 37) {
+
+    // console.log("lane1");
+    // console.log(lane1.pos);
+    // console.log("lane2");
+    // console.log(lane2.pos);
+    // console.log("lane3");
+    // console.log(lane3.pos);
+    // console.log("lane4");
+    // console.log(lane4.pos);
+    // console.log("player");
+    // console.log(player1.pos);
+    //player1.pos[1] = lane1.pos[1] - 0.2;
+    player1.pos[2] = (lane1.pos[2] - lane2.pos[2]) + 0.1;
+    // console.log("player");
+    // console.log(player1.pos);
+    player1.left = "true";
+    player1.right = "false";
   }
-  if(event.keyCode==32){
-    player1.pos[1] += 1;   
-}
-if(event.keyCode==40){
-    
-    
-  player1.pos[1] -= 1
-  
-}
-  
+  if (event.keyCode == 32) {
+    player1.pos[1] += 1;
+  }
+  if (event.keyCode == 40) {
+
+
+    player1.pos[1] -= 1
+
+  }
+
 
 }
 
@@ -188,8 +193,8 @@ function drawScene(gl, programInfo, deltaTime) {
 
   const fieldOfView = 90 * Math.PI / 180;   // in radians
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 1000.0;
+   var zNear = near;
+  var zFar =  near +1000;
   const projectionMatrix = mat4.create();
 
   // note: glmatrix.js always has the first argument
@@ -203,16 +208,22 @@ function drawScene(gl, programInfo, deltaTime) {
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
   var cameraMatrix = mat4.create();
-  mat4.translate(cameraMatrix, cameraMatrix, [2, 5, 0]);
+  mat4.translate(cameraMatrix, cameraMatrix, [cpos0, cpos1, cpos2]);
   var cameraPosition = [
     cameraMatrix[12],
     cameraMatrix[13],
     cameraMatrix[14],
   ];
+  console.log("camera");
+  console.log(cpos0);
+
+  cpos0 =  cameraMatrix[12];
+  cpos1 =  cameraMatrix[13];
+  cpos2 =  cameraMatrix[14];
 
   var up = [0, 1, 0];
 
-  mat4.lookAt(cameraMatrix, cameraPosition, c.pos, up);
+  mat4.lookAt(cameraMatrix, cameraPosition, player1.pos, up);
 
   var viewMatrix = cameraMatrix;//mat4.create();
 
@@ -222,8 +233,8 @@ function drawScene(gl, programInfo, deltaTime) {
 
   mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
-  //c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
- 
+  c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
+
   lane1.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane2.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane3.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
