@@ -29,11 +29,18 @@ function main() {
 
   c = new cube(gl, [2, 2, 4]);
   player1 = new player(gl, [0, -3, 0]);
-  track = new Array()
+  track1 = new Array()
   var i = 0;
   while (i < 1000) {
-    lane1 = new lane(gl, [0, -4, -i]);
-    track.push(lane1)
+    lane1 = new lane(gl, [-3, -4, -i]);
+    track1.push(lane1)
+    i++;
+  }
+  track2 = new Array()
+  var i = 0;
+  while (i < 1000) {
+    lane1 = new lane(gl, [4, -4, -i]);
+    track2.push(lane1)
     i++;
   }
 
@@ -126,17 +133,13 @@ function main() {
 document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
-  // if (event.keyCode == 39) {
-  //   player1.pos[2] = (lane3.pos[2] + lane4.pos[2]) / 2;
-  //   player1.left = "false";
-  //   player1.right = "true";
+  if (event.keyCode == 37) {
+    player1.pos[0] = -2.75
 
-  // }
-  // if (event.keyCode == 37) {
-  //   player1.pos[2] = (lane1.pos[2] - lane2.pos[2]) + 0.1;
-  //   player1.left = "true";
-  //   player1.right = "false";
-  // }
+  }
+  if (event.keyCode == 39) {
+    player1.pos[0] = 3.7;
+  }
   if (event.keyCode == 32) {
     player1.pos[1] += 1;
 
@@ -202,7 +205,8 @@ function drawScene(gl, programInfo, deltaTime) {
   player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
   var j = 0;
   while (j < 1000) {
-    track[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+    track1[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+    track2[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
 }
