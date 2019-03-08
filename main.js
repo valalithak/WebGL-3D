@@ -20,13 +20,14 @@ function main() {
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
   c = new cube(gl, [0, 0, 0]);
-  player1 = new player(gl, [0, 0, 0]);
+  
   lane1 = new lane(gl, [10, 0, 1.5]);
   lane2 = new lane(gl, [10, 0, 1]);
   lane3 = new lane(gl, [10, 0, -1]);
   lane4 = new lane(gl, [10, 0, -1.5]);
-  player1.pos[1] = lane3.pos[1] + 1;
-  player1.pos[2] = lane3.pos[2] + 1 
+  player1 = new player(gl, [0, 2, 0]);
+  //player1.pos[1] = lane3.pos[1] + 1;
+  //player1.pos[2] = lane3.pos[2] + 1 
   
 
   // If we don't have a GL context, give up now
@@ -94,7 +95,8 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-
+    player1.pos[0] -= 0.02;
+    // cameraMatrix[12] += 0.02;
     drawScene(gl, programInfo, deltaTime);
 
     requestAnimationFrame(render);
@@ -111,11 +113,11 @@ document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
   if (event.keyCode == 32) {
-     if (player1.pos[1] === lane1.pos[1] + 0.5 && player1.pos[2] === lane1.pos[2] + 0.5) {
+     if (player1.pos[1] === lane1.pos[1] -0.2 && player1.pos[2] === lane1.pos[2]-0.2) {
       player1.left = "true";
       player1.right = "false";
     }
-    if (player1.pos[1] === lane3.pos[1] + 1 && player1.pos[2] === lane3.pos[2] + 1) {
+    if (player1.pos[1] === lane3.pos[1]-0.6 && player1.pos[2] === lane3.pos[2]-0.6) {
       player1.left = "false";
       player1.right = "true";
     }
@@ -131,8 +133,8 @@ function handleKeyDown(event) {
       console.log(lane4.pos);
       console.log("player");
       console.log(player1.pos);
-      player1.pos[1] = lane3.pos[1] + 1;
-      player1.pos[2] = lane3.pos[2] + 1;
+      //player1.pos[1] = lane3.pos[1]-0.6;
+      player1.pos[2] = (lane3.pos[2] + lane4.pos[2])/2;
       console.log("player");
       console.log(player1.pos);
       player1.left = "false";
@@ -150,8 +152,8 @@ function handleKeyDown(event) {
       console.log(lane4.pos);
       console.log("player");
       console.log(player1.pos);
-      player1.pos[1] = lane1.pos[1] + 0.5;
-      player1.pos[2] = lane1.pos[2] + 0.5;
+      //player1.pos[1] = lane1.pos[1] - 0.2;
+      player1.pos[2] = (lane1.pos[2] - lane2.pos[2]);
       console.log("player");
       console.log(player1.pos);
       player1.left = "true";
@@ -163,7 +165,7 @@ function handleKeyDown(event) {
 }
 
 function drawScene(gl, programInfo, deltaTime) {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+  gl.clearColor(1, 1, 1, 1.0);  // Clear to black, fully opaque
   gl.clearDepth(1.0);                 // Clear everything
   gl.enable(gl.DEPTH_TEST);           // Enable depth testing
   gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
@@ -179,10 +181,10 @@ function drawScene(gl, programInfo, deltaTime) {
   // and we only want to see objects between 0.1 units
   // and 100 units away from the camera.
 
-  const fieldOfView = 45 * Math.PI / 180;   // in radians
+  const fieldOfView = 90 * Math.PI / 180;   // in radians
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
-  const zFar = 100.0;
+  const zFar = 1000.0;
   const projectionMatrix = mat4.create();
 
   // note: glmatrix.js always has the first argument
@@ -216,12 +218,12 @@ function drawScene(gl, programInfo, deltaTime) {
   mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
   //c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
-  player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
+ 
   lane1.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane2.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane3.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
   lane4.drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
-
+  player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
 }
 
 //
