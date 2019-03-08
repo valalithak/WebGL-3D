@@ -95,8 +95,13 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    player1.pos[0] -= 0.02;
+    // this moves the player front
+    //player1.pos[0] -= 0.02;
     // cameraMatrix[12] += 0.02;
+    if(player1.pos[1] > 2)
+    {
+      player1.pos[1] -= 0.1;
+    }
     drawScene(gl, programInfo, deltaTime);
 
     requestAnimationFrame(render);
@@ -112,17 +117,8 @@ function main() {
 document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
-  if (event.keyCode == 32) {
-     if (player1.pos[1] === lane1.pos[1] -0.2 && player1.pos[2] === lane1.pos[2]-0.2) {
-      player1.left = "true";
-      player1.right = "false";
-    }
-    if (player1.pos[1] === lane3.pos[1]-0.6 && player1.pos[2] === lane3.pos[2]-0.6) {
-      player1.left = "false";
-      player1.right = "true";
-    }
-    
-    if (player1.right == "false") {
+    if(event.keyCode == 39){
+   
       console.log("lane1");
       console.log(lane1.pos);
       console.log("lane2");
@@ -139,10 +135,11 @@ function handleKeyDown(event) {
       console.log(player1.pos);
       player1.left = "false";
       player1.right = "true";
-    }
     
-    else //if (player1.right == "true") {
-      {console.log("lane1");
+  }
+    if(event.keyCode==37){
+    
+      console.log("lane1");
       console.log(lane1.pos);
       console.log("lane2");
       console.log(lane2.pos);
@@ -153,14 +150,22 @@ function handleKeyDown(event) {
       console.log("player");
       console.log(player1.pos);
       //player1.pos[1] = lane1.pos[1] - 0.2;
-      player1.pos[2] = (lane1.pos[2] - lane2.pos[2]);
+      player1.pos[2] = (lane1.pos[2] - lane2.pos[2]) +0.1;
       console.log("player");
       console.log(player1.pos);
       player1.left = "true";
       player1.right = "false";
-    }
-
   }
+  if(event.keyCode==32){
+    player1.pos[1] += 1;   
+}
+if(event.keyCode==40){
+    
+    
+  player1.pos[1] -= 1
+  
+}
+  
 
 }
 
