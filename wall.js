@@ -1,20 +1,20 @@
 /// <reference path="webgl.d.ts" />
 
-let lane = class {
+let wall = class {
     constructor(gl, pos) {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
         this.positions = [
             // Front face
-            -1, -0.5, 0,
-            1, - 0.5, 0,
-            1, 0.5, 0,
-            - 1, 0.5, 0,
+            -2, -10, 0,
+            2, -10, 0,
+            2, 10, 0,
+            -2, 10, 0,
             
         ];
       
-        this.rotation = -90;
+        this.rotation = 90;
 
         this.pos = pos;
 
@@ -88,7 +88,7 @@ let lane = class {
 
         }    
 
-    drawLane(gl, projectionMatrix, programInfo, deltaTime) {
+    drawWall(gl, projectionMatrix, programInfo, deltaTime) {
         const modelViewMatrix = mat4.create();
         mat4.translate(
             modelViewMatrix,
@@ -164,7 +164,7 @@ let lane = class {
         gl.activeTexture(gl.TEXTURE0);
 
         // Bind the texture to texture unit 0
-        gl.bindTexture(gl.TEXTURE_2D, lane_texture);
+        gl.bindTexture(gl.TEXTURE_2D, wall_texture);
 
         // Tell the shader we bound the texture to texture unit 0
         gl.uniform1i(programInfo.uniformLocations.uSampler, 0);

@@ -6,9 +6,13 @@ var road;
 var road_texture;
 var wall_left;
 var wall_right;
-var wall_texturel
+var wall_texture;
 var player1;
 var player_texture;
+var coin_texture;
+var wall1;
+var wall2;
+
 
 var c_texture;
 var cam_x = 0, cam_y = 20, cam_z = 10;
@@ -30,6 +34,13 @@ function main() {
   c = new cube(gl, [2, 2, 4]);
   player1 = new player(gl, [0, -3, 0]);
   track1 = new Array()
+  coins = new Array()
+  var i = 0;
+  while (i < 10) {
+    c = new coin(gl, [0, 1, 2-5*i]);
+    coins.push(c)
+    i++;
+  }
   var i = 0;
   while (i < 1000) {
     lane1 = new lane(gl, [-3, -4, -i]);
@@ -41,6 +52,27 @@ function main() {
   while (i < 1000) {
     lane1 = new lane(gl, [4, -4, -i]);
     track2.push(lane1)
+    i++;
+  }
+  track3 = new Array()
+  var i = 0;
+  while (i < 1000) {
+    lane3 = new lane(gl, [0, -4, -i]);
+    track3.push(lane3)
+    i++;
+  }
+  wall_left = new Array()
+  var i = 0;
+  while (i < 100) {
+    wall1 = new wall(gl, [-3.5, -2, -i*10]);
+    wall_left.push(wall1)
+    i++;
+  }
+  wall_right = new Array()
+  var i = 0;
+  while (i < 100) {
+    wall2 = new wall(gl, [4.5, -2, -i*10]);
+    wall_right.push(wall2)
     i++;
   }
 
@@ -89,6 +121,8 @@ function main() {
   c_texture = loadTexture(gl, 'road.jpg');
   player_texture = loadTexture(gl, 'orange.jpg');
   lane_texture = loadTexture(gl, 'road.jpg');
+  coin_texture = loadTexture(gl, 'coin.jpeg');
+  wall_texture = loadTexture(gl, 'brickwall.jpg');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -207,6 +241,18 @@ function drawScene(gl, programInfo, deltaTime) {
   while (j < 1000) {
     track1[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
     track2[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+    track3[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
+  var j = 0;
+  while (j < 10) {
+    coins[j].drawCoin(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
+  var j = 0;
+  while (j < 100) {
+    wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
 }
