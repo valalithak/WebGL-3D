@@ -13,8 +13,9 @@ var coin_texture;
 var obs1_texture;
 var wall1;
 var wall2;
-
-
+var fly_texture;
+var fly_count = 0;
+var train_texture;
 
 var c_texture;
 var cam_x = 0, cam_y = 20, cam_z = 10;
@@ -38,18 +39,22 @@ function main() {
   player1 = new player(gl, [0, -3, 0]);
   track1 = new Array()
   coins = new Array()
+  // coins
   var i = 0;
   while (i < 10) {
     c = new coin(gl, [0, 1, 2 - 5 * i]);
     coins.push(c)
     i++;
   }
+  // left lane
   var i = 0;
   while (i < 1000) {
     lane1 = new lane(gl, [-3, -4, -i]);
     track1.push(lane1)
     i++;
   }
+
+  // right lane
   track2 = new Array()
   var i = 0;
   while (i < 1000) {
@@ -57,6 +62,8 @@ function main() {
     track2.push(lane1)
     i++;
   }
+
+  // middle lane
   track3 = new Array()
   var i = 0;
   while (i < 1000) {
@@ -64,6 +71,8 @@ function main() {
     track3.push(lane3)
     i++;
   }
+
+  // left wall
   wall_left = new Array()
   var i = 0;
   while (i < 1000) {
@@ -71,6 +80,8 @@ function main() {
     wall_left.push(wall1)
     i++;
   }
+
+  // right wall
   wall_right = new Array()
   var i = 0;
   while (i < 100) {
@@ -78,15 +89,37 @@ function main() {
     wall_right.push(wall2)
     i++;
   }
+
+  // obstacles type 1
   skull = new Array()
-
   obs1 = new obstacle1(gl, [0, -3, -20]);
-  skull.push(obs1)
+  skull.push(obs1);
   obs2 = new obstacle1(gl, [3.7, -3, -100]);
-  skull.push(obs2) 
+  skull.push(obs2);
   obs3 = new obstacle1(gl, [-2.75, -3, -65]);
-  skull.push(obs3)
+  skull.push(obs3);
 
+  // fly boost 
+  fboost = new Array()
+  var i = 0;
+  while (i < 4) {
+    var x = i%3;
+    if (i % 3 === 0) {
+      x = 0;
+    }
+    if (i % 3 === 1) {
+      x = 3.7;
+    }
+    if (i % 3 === 2) {
+      x = 3.7;
+    }
+    fb = new fly_boost(gl, [x, -1, -(i*100+50)]);
+    fboost.push(fb);
+    i++;;
+  }
+
+  // train
+  tr = new train(gl, [0, -3, -100]);
 
 
   // If we don't have a GL context, give up now
@@ -137,6 +170,8 @@ function main() {
   wall_texture = loadTexture(gl, 'brickwall.jpg');
   wall_grass_texture = loadTexture(gl, 'wall_grass.jpeg');
   obs1_texture = loadTexture(gl, 'skull.png');
+  fly_texture = loadTexture(gl, 'fly.jpg');
+  train_texture = loadTexture(gl, 'train.jpeg');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -168,21 +203,18 @@ function main() {
     if (player1.pos[1] > -3) {
       player1.pos[1] -= 0.75;
     }
-    if(player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -65)
-    {
+    if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -65) {
       alert("Game Over");
     }
-    if(player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20)
-    {
+    if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20) {
       alert("Game Over");
     }
-    if(player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -100)
-    {
+    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -100) {
       alert("Game Over");
     }
     player1.pos[2] -= 0.5;
     cam_z -= 0.5;
-    
+
     drawScene(gl, programInfo, deltaTime);
 
     requestAnimationFrame(render);
@@ -275,6 +307,7 @@ function drawScene(gl, programInfo, deltaTime) {
 
   //c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
   player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
+  tr.drawTrain(gl, viewProjectionMatrix, programInfo, deltaTime);
   var j = 0;
   while (j < 1000) {
     track1[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
@@ -302,6 +335,13 @@ function drawScene(gl, programInfo, deltaTime) {
   var j = 0;
   while (j < 3) {
     skull[j].drawSkull(gl, viewProjectionMatrix, programInfo, deltaTime);
+    //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
+  var j = 0;
+  while (j < 4) {
+    fboost[j].drawFlyBoost(gl, viewProjectionMatrix, programInfo, deltaTime);
+    console.log(fboost[j].pos)
     //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
