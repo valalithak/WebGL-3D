@@ -7,6 +7,7 @@ var road_texture;
 var wall_left;
 var wall_right;
 var wall_texture;
+var wall_grass_texture;
 var player1;
 var player_texture;
 var coin_texture;
@@ -63,15 +64,15 @@ function main() {
   }
   wall_left = new Array()
   var i = 0;
-  while (i < 100) {
-    wall1 = new wall(gl, [-3.5, -2, -i*10]);
+  while (i < 1000) {
+    wall1 = new wall_brick(gl, [-3.1, -2, -1-i]);
     wall_left.push(wall1)
     i++;
   }
   wall_right = new Array()
   var i = 0;
   while (i < 100) {
-    wall2 = new wall(gl, [4.5, -2, -i*10]);
+    wall2 = new wall(gl, [4.6, -2, -i*8]);
     wall_right.push(wall2)
     i++;
   }
@@ -123,6 +124,7 @@ function main() {
   lane_texture = loadTexture(gl, 'road.jpg');
   coin_texture = loadTexture(gl, 'coin.jpeg');
   wall_texture = loadTexture(gl, 'brickwall.jpg');
+  wall_grass_texture = loadTexture(gl, 'wall_grass.jpeg');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -251,8 +253,14 @@ function drawScene(gl, programInfo, deltaTime) {
   }
   var j = 0;
   while (j < 100) {
-    wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    //wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
+  var j = 0;
+  while (j < 1000) {
+    wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
 }
