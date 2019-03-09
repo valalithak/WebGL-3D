@@ -41,8 +41,26 @@ function main() {
   coins = new Array()
   // coins
   var i = 0;
+  while (i < 20) {
+    c = new coin(gl, [0, 1, -(2 + 5 * i)]);
+    coins.push(c)
+    i++;
+  }
+  var i = 0;
+  while (i < 50) {
+    c = new coin(gl, [-2.7, -0.5, -(100 + 5 * i)]);
+    coins.push(c)
+    i++;
+  }
+  var i = 0;
+  while (i < 30) {
+    c = new coin(gl, [3.7, -0.5, -(150 + 5 * i)]);
+    coins.push(c)
+    i++;
+  }
+  var i = 0;
   while (i < 10) {
-    c = new coin(gl, [0, 1, 2 - 5 * i]);
+    c = new coin(gl, [0, 0, -(250 + 5 * i)]);
     coins.push(c)
     i++;
   }
@@ -94,33 +112,25 @@ function main() {
   skull = new Array()
   obs1 = new obstacle1(gl, [0, -3, -20]);
   skull.push(obs1);
-  obs2 = new obstacle1(gl, [3.7, -3, -100]);
+  obs2 = new obstacle1(gl, [3.7, -3, -40]);
   skull.push(obs2);
-  obs3 = new obstacle1(gl, [-2.75, -3, -65]);
+  obs3 = new obstacle1(gl, [-2.75, -3, -60]);
   skull.push(obs3);
 
   // fly boost 
   fboost = new Array()
   var i = 0;
   while (i < 4) {
-    var x = i%3;
-    if (i % 3 === 0) {
-      x = 0;
-    }
-    if (i % 3 === 1) {
-      x = 3.7;
-    }
-    if (i % 3 === 2) {
-      x = 3.7;
-    }
-    fb = new fly_boost(gl, [x, -1, -(i*100+50)]);
+    fb = new fly_boost(gl, [0, -3, -(i * 100 + 50)]);
     fboost.push(fb);
     i++;;
   }
 
   // train
-  tr = new train(gl, [0, -3, -100]);
 
+  tr1 = new train(gl, [0, -3, -200]);
+  tr2 = new train(gl, [3.7, -3, -500]);
+  tr3 = new train(gl, [-2.75, -3, -100]);
 
   // If we don't have a GL context, give up now
 
@@ -200,20 +210,29 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
+
+
+
     if (player1.pos[1] > -3) {
       player1.pos[1] -= 0.75;
     }
-    if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -65) {
+
+
+    if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -60) {
       alert("Game Over");
     }
     if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20) {
       alert("Game Over");
     }
-    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -100) {
+    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -40) {
       alert("Game Over");
     }
+
     player1.pos[2] -= 0.5;
     cam_z -= 0.5;
+
+    tr1.pos[2] += 2;
+    tr2.pos[2] += 3;
 
     drawScene(gl, programInfo, deltaTime);
 
@@ -307,7 +326,9 @@ function drawScene(gl, programInfo, deltaTime) {
 
   //c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
   player1.drawPlayer(gl, viewProjectionMatrix, programInfo, deltaTime);
-  tr.drawTrain(gl, viewProjectionMatrix, programInfo, deltaTime);
+  tr1.drawTrain(gl, viewProjectionMatrix, programInfo, deltaTime);
+  tr2.drawTrain(gl, viewProjectionMatrix, programInfo, deltaTime);
+  tr3.drawTrain(gl, viewProjectionMatrix, programInfo, deltaTime);
   var j = 0;
   while (j < 1000) {
     track1[j].drawLane(gl, viewProjectionMatrix, programInfo, deltaTime);
@@ -316,7 +337,7 @@ function drawScene(gl, programInfo, deltaTime) {
     j++;
   }
   var j = 0;
-  while (j < 10) {
+  while (j < 110) {
     coins[j].drawCoin(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
