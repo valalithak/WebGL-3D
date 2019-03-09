@@ -2,7 +2,6 @@ var cubeRotation = 0.0;
 
 var c;
 var c1;
-var road;
 var road_texture;
 var wall_left;
 var wall_right;
@@ -11,8 +10,10 @@ var wall_grass_texture;
 var player1;
 var player_texture;
 var coin_texture;
+var obs1_texture;
 var wall1;
 var wall2;
+
 
 
 var c_texture;
@@ -32,13 +33,14 @@ function main() {
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
+
   c = new cube(gl, [2, 2, 4]);
   player1 = new player(gl, [0, -3, 0]);
   track1 = new Array()
   coins = new Array()
   var i = 0;
   while (i < 10) {
-    c = new coin(gl, [0, 1, 2-5*i]);
+    c = new coin(gl, [0, 1, 2 - 5 * i]);
     coins.push(c)
     i++;
   }
@@ -65,17 +67,26 @@ function main() {
   wall_left = new Array()
   var i = 0;
   while (i < 1000) {
-    wall1 = new wall_brick(gl, [-3.1, -2, -1-i]);
+    wall1 = new wall_brick(gl, [-3.1, -2, -1 - i]);
     wall_left.push(wall1)
     i++;
   }
   wall_right = new Array()
   var i = 0;
   while (i < 100) {
-    wall2 = new wall(gl, [4.6, -2, -i*8]);
+    wall2 = new wall(gl, [4.6, -2, -i * 8]);
     wall_right.push(wall2)
     i++;
   }
+  skull = new Array()
+
+  obs1 = new obstacle1(gl, [0, -3, -20]);
+  skull.push(obs1)
+  obs2 = new obstacle1(gl, [3.7, -3, -100]);
+  skull.push(obs2) 
+  obs3 = new obstacle1(gl, [-2.75, -3, -65]);
+  skull.push(obs3)
+
 
 
   // If we don't have a GL context, give up now
@@ -125,6 +136,7 @@ function main() {
   coin_texture = loadTexture(gl, 'coin.jpeg');
   wall_texture = loadTexture(gl, 'brickwall.jpg');
   wall_grass_texture = loadTexture(gl, 'wall_grass.jpeg');
+  obs1_texture = loadTexture(gl, 'skull.png');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -154,11 +166,23 @@ function main() {
     const deltaTime = now - then;
     then = now;
     if (player1.pos[1] > -3) {
-      player1.pos[1] -= 0.4;
+      player1.pos[1] -= 0.75;
+    }
+    if(player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -65)
+    {
+      alert("Game Over");
+    }
+    if(player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20)
+    {
+      alert("Game Over");
+    }
+    if(player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -100)
+    {
+      alert("Game Over");
     }
     player1.pos[2] -= 0.5;
     cam_z -= 0.5;
-    console.log(player1.pos[2]);
+    
     drawScene(gl, programInfo, deltaTime);
 
     requestAnimationFrame(render);
@@ -169,15 +193,27 @@ function main() {
 document.onkeydown = handleKeyDown;
 function handleKeyDown(event) {
 
-  if (event.keyCode == 37) {
-    player1.pos[0] = -2.75
+  if (event.keyCode == 37) { // left 
+    if (player1.pos[0] == 0) {
+      player1.pos[0] = -2.75;
+    }
+    if (player1.pos[0] == 3.7) {
+      player1.pos[0] = 0;
+    }
+  }
 
+  if (event.keyCode == 39) //right
+  {
+    if (player1.pos[0] == 0) {
+      player1.pos[0] = 3.7;
+    }
+    if (player1.pos[0] == -2.75) {
+      player1.pos[0] = 0;
+    }
   }
-  if (event.keyCode == 39) {
-    player1.pos[0] = 3.7;
-  }
+
   if (event.keyCode == 32) {
-    player1.pos[1] += 1;
+    player1.pos[1] += 2;
 
   }
 
@@ -260,6 +296,12 @@ function drawScene(gl, programInfo, deltaTime) {
   var j = 0;
   while (j < 1000) {
     wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
+  var j = 0;
+  while (j < 3) {
+    skull[j].drawSkull(gl, viewProjectionMatrix, programInfo, deltaTime);
     //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
