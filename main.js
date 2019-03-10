@@ -11,6 +11,7 @@ var player1;
 var player_texture;
 var coin_texture;
 var obs1_texture;
+var obs1_texture;
 var wall1;
 var wall2;
 var fly_texture;
@@ -27,6 +28,9 @@ var c_texture;
 var cop_texture;
 policetime = 0;
 overflag = 0;
+collidetime = 0;
+collidenum = 0;
+speed = 0.25;
 var cam_x = 0, cam_y = 20, cam_z = 10;
 
 main();
@@ -124,12 +128,28 @@ function main() {
 
   // obstacles type 1
   skull = new Array()
-  obs1 = new obstacle1(gl, [0, -3, -20]);
+  obs1 = new obstacle1(gl, [0, -3, -180]);
   skull.push(obs1);
-  obs2 = new obstacle1(gl, [3.7, -3, -40]);
+  obs2 = new obstacle1(gl, [3.7, -3, -270]);
   skull.push(obs2);
-  obs3 = new obstacle1(gl, [-2.75, -3, -60]);
+  obs3 = new obstacle1(gl, [-2.75, -3, -100]);
   skull.push(obs3);
+
+  // obstacles type 2
+  dodge = new Array()
+  ob1 = new obstacle2(gl, [0, -3, -20]);
+  dodge.push(ob1);
+  ob2 = new obstacle2(gl, [3.7, -3, -70]);
+  dodge.push(ob2);
+  ob3 = new obstacle2(gl, [-2.75, -3, -150]);
+  dodge.push(ob3);
+  ob4 = new obstacle2(gl, [3.7, -3, -120]);
+  dodge.push(ob4);
+  ob5 = new obstacle2(gl, [3.7, -3, -128]);
+  dodge.push(ob5);
+
+
+
 
   // fly boost 
   fboost = new Array()
@@ -143,7 +163,7 @@ function main() {
   // train
 
   tr1 = new train(gl, [0, -3, -400]);
-  tr2 = new train(gl, [3.7, -3, -900]);
+  tr2 = new train(gl, [3.7, -3, -2000]);
   tr3 = new train(gl, [-2.75, -3, -100]);
 
   // If we don't have a GL context, give up now
@@ -194,6 +214,7 @@ function main() {
   wall_texture = loadTexture(gl, 'brickwall.jpg');
   wall_grass_texture = loadTexture(gl, 'wall_grass.jpeg');
   obs1_texture = loadTexture(gl, 'skull.png');
+  obs2_texture = loadTexture(gl, 'obstacle2.png');
   fly_texture = loadTexture(gl, 'fly.jpg');
   train_texture = loadTexture(gl, 'train.jpeg');
   dog_texture = loadTexture(gl, 'dog.jpg');
@@ -226,29 +247,36 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    console.log(player1.pos, policetime);
+    console.log(player1.pos, collidenum);
     policetime++;
-    if(overflag == 1)
+    if(collidetime>0 && collidetime <90)
     {
-     alert("Game Over! Score : " + score);
+      collidetime++;
+    }
+    if(collidetime == 90)
+    {
+      collidetime = 0;
+      speed  = 0.25;
+    }
+    
+    if (overflag == 1) {
+      alert("Game Over! Score : " + score);
 
     }
-    if(policetime<50)
-    {
+    if (policetime < 50) {
       police.pos[2] -= 0.05;
     }
-    dog1.pos[0]  = player1.pos[0];
+    dog1.pos[0] = player1.pos[0];
     dog1.pos[2] = player1.pos[2] + 1;
     police.pos[2] = dog1.pos[2];
-    
-    if(inair==true && aircount < 10)
-    {
+
+    if (inair == true && aircount < 10) {
       player1.pos[1] += 1;
       aircount++;
     }
-    if (inair == true && aircount >= 5 && aircount <150) {
-     jump = true;
-     aircount++;
+    if (inair == true && aircount >= 5 && aircount < 150) {
+      jump = true;
+      aircount++;
     }
     if (aircount >= 150) {
       jump = false;
@@ -258,13 +286,11 @@ function main() {
 
 
 
-    
-    if(player1.pos[0] == -2.75 && player1.pos[2] <= -99 && player1.pos[2] >= -120)
-    {
+
+    if (player1.pos[0] == -2.75 && player1.pos[2] <= -99 && player1.pos[2] >= -120) {
       intrainleft = true;
     }
-    else
-    {
+    else {
       intrainleft = false;
     }
 
@@ -278,14 +304,7 @@ function main() {
       player1.pos[1] = -3;
     }
 
-    if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -60) {
-      police.pos[0] = player1.pos[0];
-      police.pos[1] = player1.pos[1];
-      police.pos[2] = player1.pos[2];
-      overflag = 1;
-      //alert("Game Over! Score : " + score);
-    }
-
+    
     if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20) {
       police.pos[0] = player1.pos[0];
       police.pos[1] = player1.pos[1];
@@ -293,8 +312,58 @@ function main() {
       overflag = 1;
       //alert("Game Over! Score : " + score);
     }
+    if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -150) {
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
+    }
+    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -70) {
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
+    }
 
-    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -40) {
+
+
+
+
+
+    if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -100) {
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
+    }
+    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -120) {
+      collidenum++;
+      speed -= 0.15;
+      collidetime = 1;
+    }
+    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] <= -127.5) {
+      collidenum++;
+      if(collidenum==2)
+      {
+        police.pos[0] = player1.pos[0];
+        police.pos[1] = player1.pos[1];
+        police.pos[2] = player1.pos[2];
+        overflag = 1; 
+      }
+    }
+
+    if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -180) {
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
+    }
+
+    if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -270) {
 
       police.pos[0] = player1.pos[0];
       police.pos[1] = player1.pos[1];
@@ -303,15 +372,15 @@ function main() {
       //alert("Game Over! Score : " + score);
     }
 
-    player1.pos[2] -= 0.25;
-    cam_z -= 0.25;
+    player1.pos[2] -= speed;
+    cam_z -= speed;
 
-   
+
     tr1.pos[2] += 2;
 
-  
+
     tr2.pos[2] += 3;
-  
+
     xp = player1.pos[0];
     yp = player1.pos[1];
     zp = player1.pos[2];
@@ -323,25 +392,25 @@ function main() {
 
       if (xp == 0 && yp == 1 && zp == -(2 + 5 * coinloop)) {
         coins[coinloop].taken = true;
-        score+=10; 
+        score += 10;
       }
       if (xp == -2.75 && yp == 1 && zp == -(100 + 5 * (coinloop))) {
-        
+
         coins[coinloop + 10].taken = true;
-        score+=10;
-       
+        score += 10;
+
       }
       if (xp == 3.7 && yp == 1 && zp == -(150 + 5 * (coinloop))) {
 
         coins[coinloop + 30].taken = true;
-        score+=10;
-        
+        score += 10;
+
       }
       if (xp == 0 && yp == 1 && zp == -(250 + 5 * (coinloop))) {
 
         coins[coinloop + 60].taken = true;
-        score+=10;
-       
+        score += 10;
+
       }
       coinloop++;
     }
@@ -349,9 +418,9 @@ function main() {
     yp = player1.pos[1];
     zp = player1.pos[2];
     // checking for train collsions
-   
-  
-    if (xp == 3.7 && yp == -3 && zp - tr3.pos[2] < 30.75 && zp - tr3.pos[2] > 0) {
+
+
+    if (xp == 3.7 && yp == -3 && zp - tr2.pos[2] < 3.75 && zp - tr2.pos[2] > 0) {
       tr2.collided = true;
       police.pos[0] = player1.pos[0];
       police.pos[1] = player1.pos[1];
@@ -374,11 +443,10 @@ function main() {
     // checking for flying powerup collisions
     var floop = 0;
     while (floop < 4) {
-      if(xp == 0 && yp == -3 && zp == -(floop * 100 + 50))
-      {
-          inair = true;
-          aircount = 0;
-          fboost[floop].taken = true;
+      if (xp == 0 && yp == -3 && zp == -(floop * 100 + 50)) {
+        inair = true;
+        aircount = 0;
+        fboost[floop].taken = true;
       }
       floop++;
     }
@@ -415,8 +483,14 @@ function handleKeyDown(event) {
   }
 
   if (event.keyCode == 32) {
-    if (player1.pos[1] + 2 <= 1) {
-      player1.pos[1] += 2;
+    if (intrainleft == false) {
+      if (player1.pos[1] + 2 <= 1) {
+        player1.pos[1] += 2;
+        jump = true;
+      }
+    }
+    else if (intrainleft == true) {
+      player1.pos[1] = 1;
       jump = true;
     }
 
@@ -518,19 +592,25 @@ function drawScene(gl, programInfo, deltaTime) {
   var j = 0;
   while (j < 3) {
     skull[j].drawSkull(gl, viewProjectionMatrix, programInfo, deltaTime);
+    // dodge[j].drawObs(gl, viewProjectionMatrix, programInfo, deltaTime);
+    j++;
+  }
+  var j = 0;
+  while (j < 5) {
+    // skull[j].drawSkull(gl, viewProjectionMatrix, programInfo, deltaTime);
+    dodge[j].drawObs(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
   var j = 0;
   while (j < 4) {
-    if(fboost[j].taken==false){
-    fboost[j].drawFlyBoost(gl, viewProjectionMatrix, programInfo, deltaTime);
+    if (fboost[j].taken == false) {
+      fboost[j].drawFlyBoost(gl, viewProjectionMatrix, programInfo, deltaTime);
     }
     j++;
-    
+
   }
   dog1.drawDog(gl, viewProjectionMatrix, programInfo, deltaTime);
-  if(policetime<50 || overflag == 1)
-  {
+  if (policetime < 50 || overflag == 1) {
     police.drawCop(gl, viewProjectionMatrix, programInfo, deltaTime);
   }
 }
