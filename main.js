@@ -17,6 +17,7 @@ var fly_texture;
 var fly_count = 0;
 var train_texture;
 jump = false;
+var coinloop = 0;
 
 var c_texture;
 var cam_x = 0, cam_y = 20, cam_z = 10;
@@ -48,27 +49,29 @@ function main() {
     //c.setAttribute('taken', 'false');
     i++;
   }
-  // var i = 0;
-  // while (i < 10) {
-  //   c = new coin(gl, [-2.7, -0.5, -(100 + 5 * i)]);
-  //   coins.push(c);
-  //   //c.setAttribute('taken', 'false');
-  //   i++;
-  // }
-  // var i = 0;
-  // while (i < 30) {
-  //   c = new coin(gl, [3.7, -0.5, -(150 + 5 * i)]);
-  //   coins.push(c);
-  //   //c.setAttribute('taken', 'false');
-  //   i++;
-  // }
-  // var i = 0;
-  // while (i < 10) {
-  //   c = new coin(gl, [0, 0, -(250 + 5 * i)]);
-  //   coins.push(c);
-  //   //c.setAttribute('taken', 'false');
-  //   i++;
-  // }
+  var i = 0;
+  while (i < 20) {
+    c = new coin(gl, [-2.7, 1, -(100 + 5 * i)]);
+    coins.push(c);
+    console.log(i, "at");
+    console.log(c.pos);
+    //c.setAttribute('taken', 'false');
+    i++;
+  }
+  var i = 0;
+  while (i < 30) {
+    c = new coin(gl, [3.7, 1, -(150 + 5 * i)]);
+    coins.push(c);
+    //c.setAttribute('taken', 'false');
+    i++;
+  }
+  var i = 0;
+  while (i < 10) {
+    c = new coin(gl, [0, 1, -(250 + 5 * i)]);
+    coins.push(c);
+    //c.setAttribute('taken', 'false');
+    i++;
+  }
   // left lane
   var i = 0;
   while (i < 1000) {
@@ -215,42 +218,77 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
+    console.log(player1.pos);
 
-
-
-    // if (player1.pos[1] > -3 && jump == false) {
-    //   player1.pos[1] -= 0.75;
-    // }
-
+    if (player1.pos[1] > -3 && jump == false) {
+      player1.pos[1] -= 0.75;
+    }
+    if (player1.pos[1] < -3) {
+      player1.pos[1] = -3;
+    }
 
     if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -60) {
       alert("Game Over");
     }
+
     if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20) {
       alert("Game Over");
     }
+
     if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -40) {
       alert("Game Over");
     }
 
-    player1.pos[2] -= 0.75;
-    cam_z -= 0.75;
+    player1.pos[2] -= 0.25;
+    cam_z -= 0.25;
 
     tr1.pos[2] += 2;
     tr2.pos[2] += 3;
-    var i = 0;
-    while (i < 10) {
-      console.log(player1.pos);
-      console.log(coins[i].pos);
-      console.log(i);
-      console.log("-----------------------------------------------------");
+    xp = player1.pos[0];
+    yp = player1.pos[1];
+    zp = player1.pos[2];
+    coinloop = 0;
+    while (coinloop < 10) {
 
-      if (player1.pos[0] == coins[i].pos[0] && player1.pos[1] == coins[i].pos[1] && player1.pos[2] == coins[i].pos[2]) {
-        coins[i].taken = true;
-        console.log("taken " + String(i));
+
+      if (xp == 0 && yp == 1 && zp == -(2 + 5 * coinloop)) {
+        coins[coinloop].taken = true;
+        //console.log("taken");
+        //console.log(coinloop);
       }
-      i++;
+      if (xp == -2.75 && yp == 1 && zp == -(100 + 5 * (coinloop))) {
+        
+        coins[coinloop + 10].taken = true;
+        console.log("taken");
+        console.log(coinloop);
+      }
+      if (xp == 3.7 && yp == 1 && zp == -(150 + 5 * (coinloop))) {
+
+        coins[coinloop + 30].taken = true;
+        console.log("taken");
+        console.log(coinloop);
+      }
+      if (xp == 0 && yp == 1 && zp == -(250 + 5 * (coinloop))) {
+
+        coins[coinloop + 60].taken = true;
+        console.log("taken");
+        console.log(coinloop);
+      }
+      coinloop++;
     }
+    // coinloop1 = 0;
+    // while (coinloop1 < 10) {
+    //   //console.log(coins[coinloop+9].pos);
+    //   // console.log(-(100 + 5 * (coinloop1)));
+    //   if (xp == -2.7 && yp == 1 && zp == -(100 + 5 * (coinloop1))) {
+    //     alert("taken");
+    //     coins[coinloop1 + 9].taken = true;
+    //     console.log("taken");
+    //     console.log(coinloop);
+    //   }
+    //   coinloop1++;
+    // }
+
 
     drawScene(gl, programInfo, deltaTime);
 
@@ -366,7 +404,7 @@ function drawScene(gl, programInfo, deltaTime) {
     j++;
   }
   var j = 0;
-  while (j < 10) {
+  while (j < 70) {
     if (coins[j].taken == false) {
       coins[j].drawCoin(gl, viewProjectionMatrix, programInfo, deltaTime);
     }
