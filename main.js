@@ -24,6 +24,9 @@ var coinloop = 0;
 var dog_texture;
 var score = 0;
 var c_texture;
+var cop_texture;
+policetime = 0;
+overflag = 0;
 var cam_x = 0, cam_y = 20, cam_z = 10;
 
 main();
@@ -43,6 +46,7 @@ function main() {
 
   c = new cube(gl, [2, 2, 4]);
   player1 = new player(gl, [0, -3, 0]);
+  police = new cop(gl, [3.7, -3.5, -9]);
   dog1 = new dog(gl, [0, -3.5, -7]);
   track1 = new Array()
   coins = new Array()
@@ -145,7 +149,7 @@ function main() {
   // If we don't have a GL context, give up now
 
   if (!gl) {
-    alert('Unable to initialize WebGL. Your browser or machine may not support it.');
+    //alert('Unable to initialize WebGL. Your browser or machine may not support it.');
     return;
   }
 
@@ -193,6 +197,7 @@ function main() {
   fly_texture = loadTexture(gl, 'fly.jpg');
   train_texture = loadTexture(gl, 'train.jpeg');
   dog_texture = loadTexture(gl, 'dog.jpg');
+  cop_texture = loadTexture(gl, 'police.jpg');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -221,9 +226,20 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    console.log(player1.pos, aircount);
+    console.log(player1.pos, policetime);
+    policetime++;
+    if(overflag == 1)
+    {
+     alert("Game Over! Score : " + score);
+
+    }
+    if(policetime<50)
+    {
+      police.pos[2] -= 0.05;
+    }
     dog1.pos[0]  = player1.pos[0];
     dog1.pos[2] = player1.pos[2] + 1;
+    police.pos[2] = dog1.pos[2];
     
     if(inair==true && aircount < 10)
     {
@@ -263,15 +279,28 @@ function main() {
     }
 
     if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -60) {
-      alert("Game Over! Score : " + score);
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
     }
 
     if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20) {
-      alert("Game Over! Score : " + score);
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
     }
 
     if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -40) {
-      alert("Game Over! Score : " + score);
+
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! Score : " + score);
     }
 
     player1.pos[2] -= 0.25;
@@ -324,11 +353,19 @@ function main() {
   
     if (xp == 3.7 && yp == -3 && zp - tr3.pos[2] < 30.75 && zp - tr3.pos[2] > 0) {
       tr2.collided = true;
-      alert("Game Over tran2 coolided! Score : " + score);
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over tran2 coolided! Score : " + score);
     }
     if (xp == 0 && yp == -3 && zp - tr1.pos[2] < 3.75 && zp - tr1.pos[2] > 0) {
       tr1.collided = true;
-      alert("Game Over! tr1 collided Score : " + score);
+      police.pos[0] = player1.pos[0];
+      police.pos[1] = player1.pos[1];
+      police.pos[2] = player1.pos[2];
+      overflag = 1;
+      //alert("Game Over! tr1 collided Score : " + score);
     }
 
     xp = player1.pos[0];
@@ -492,6 +529,10 @@ function drawScene(gl, programInfo, deltaTime) {
     
   }
   dog1.drawDog(gl, viewProjectionMatrix, programInfo, deltaTime);
+  if(policetime<50 || overflag == 1)
+  {
+    police.drawCop(gl, viewProjectionMatrix, programInfo, deltaTime);
+  }
 }
 
 //
@@ -508,10 +549,10 @@ function initShaderProgram(gl, vsSource, fsSource) {
   gl.attachShader(shaderProgram, fragmentShader);
   gl.linkProgram(shaderProgram);
 
-  // If creating the shader program failed, alert
+  // If creating the shader program failed, //alert
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+    //alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
     return null;
   }
 
@@ -591,7 +632,7 @@ function loadShader(gl, type, source) {
   // See if it compiled successfully
 
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+    //alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
