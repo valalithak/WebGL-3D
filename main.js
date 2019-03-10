@@ -18,6 +18,7 @@ var fly_count = 0;
 var train_texture;
 jump = false;
 inair = false;
+aircount = 0;
 intrainleft = false;
 var coinloop = 0;
 var dog_texture;
@@ -220,9 +221,28 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    console.log(player1.pos, tr1.pos, player1.pos[2] - tr1.pos[2]);
+    console.log(player1.pos, aircount);
     dog1.pos[0]  = player1.pos[0];
     dog1.pos[2] = player1.pos[2] + 1;
+    
+    if(inair==true && aircount < 10)
+    {
+      player1.pos[1] += 1;
+      aircount++;
+    }
+    if (inair == true && aircount >= 5 && aircount <150) {
+     jump = true;
+     aircount++;
+    }
+    if (aircount >= 150) {
+      jump = false;
+      inair = false;
+      aircount = 0;
+    }
+
+
+
+    
     if(player1.pos[0] == -2.75 && player1.pos[2] <= -99 && player1.pos[2] >= -120)
     {
       intrainleft = true;
@@ -257,12 +277,12 @@ function main() {
     player1.pos[2] -= 0.25;
     cam_z -= 0.25;
 
-    if(tr1.collided == false){
+   
     tr1.pos[2] += 2;
-    }
-    if(tr2.collided == false){
+
+  
     tr2.pos[2] += 3;
-    }
+  
     xp = player1.pos[0];
     yp = player1.pos[1];
     zp = player1.pos[2];
@@ -300,20 +320,15 @@ function main() {
     yp = player1.pos[1];
     zp = player1.pos[2];
     // checking for train collsions
-    if (xp == tr1.pos[0] && yp == tr1.pos[1] && zp == tr1.pos[2] + 0.25) {
-      alert("Game Over! Score : " + score);
-    }
-    if (xp == tr2.pos[0] && yp == tr2.pos[1] && zp == tr2.pos[2] + 0.25) {
-      alert("Game Over! Score : " + score);
-    }
+   
   
-    if (xp == 3.7 && yp == -3 && (zp - tr3.pos[2]) < 30.75) {
+    if (xp == 3.7 && yp == -3 && zp - tr3.pos[2] < 30.75 && zp - tr3.pos[2] > 0) {
       tr2.collided = true;
-      alert("Game Over! Score : " + score);
+      alert("Game Over tran2 coolided! Score : " + score);
     }
-    if (xp == 0 && yp == -3 && (zp - tr1.pos[2]) < 3.75) {
+    if (xp == 0 && yp == -3 && zp - tr1.pos[2] < 3.75 && zp - tr1.pos[2] > 0) {
       tr1.collided = true;
-      alert("Game Over! Score : " + score);
+      alert("Game Over! tr1 collided Score : " + score);
     }
 
     xp = player1.pos[0];
@@ -325,6 +340,7 @@ function main() {
       if(xp == 0 && yp == -3 && zp == -(floop * 100 + 50))
       {
           inair = true;
+          aircount = 0;
           fboost[floop].taken = true;
       }
       floop++;
@@ -471,8 +487,9 @@ function drawScene(gl, programInfo, deltaTime) {
   while (j < 4) {
     if(fboost[j].taken==false){
     fboost[j].drawFlyBoost(gl, viewProjectionMatrix, programInfo, deltaTime);
-    j++;
     }
+    j++;
+    
   }
   dog1.drawDog(gl, viewProjectionMatrix, programInfo, deltaTime);
 }
