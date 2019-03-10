@@ -3,6 +3,7 @@
 let coin = class {
     constructor(gl, pos) {
         this.positionBuffer = gl.createBuffer();
+        this.taken = false;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
         this.positions = [
