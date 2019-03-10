@@ -17,9 +17,11 @@ var fly_texture;
 var fly_count = 0;
 var train_texture;
 jump = false;
+inair = false;
+intrainleft = false;
 var coinloop = 0;
 var dog_texture;
-
+var score = 0;
 var c_texture;
 var cam_x = 0, cam_y = 20, cam_z = 10;
 
@@ -135,8 +137,8 @@ function main() {
 
   // train
 
-  tr1 = new train(gl, [0, -3, -200]);
-  tr2 = new train(gl, [3.7, -3, -500]);
+  tr1 = new train(gl, [0, -3, -400]);
+  tr2 = new train(gl, [3.7, -3, -900]);
   tr3 = new train(gl, [-2.75, -3, -100]);
 
   // If we don't have a GL context, give up now
@@ -218,78 +220,116 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    console.log(player1.pos);
+    console.log(player1.pos, tr1.pos, player1.pos[2] - tr1.pos[2]);
     dog1.pos[0]  = player1.pos[0];
     dog1.pos[2] = player1.pos[2] + 1;
+    if(player1.pos[0] == -2.75 && player1.pos[2] <= -99 && player1.pos[2] >= -120)
+    {
+      intrainleft = true;
+    }
+    else
+    {
+      intrainleft = false;
+    }
 
-    if (player1.pos[1] > -3 && jump == false) {
+    if (player1.pos[1] > -3 && jump == false && intrainleft == false) {
       player1.pos[1] -= 0.75;
+    }
+    if (player1.pos[1] > -2.3 && jump == false && intrainleft == true) {
+      player1.pos[1] = -2.3;
     }
     if (player1.pos[1] < -3) {
       player1.pos[1] = -3;
     }
 
     if (player1.pos[0] === -2.75 && player1.pos[1] === -3 && player1.pos[2] === -60) {
-      alert("Game Over");
+      alert("Game Over! Score : " + score);
     }
 
     if (player1.pos[0] === 0 && player1.pos[1] === -3 && player1.pos[2] === -20) {
-      alert("Game Over");
+      alert("Game Over! Score : " + score);
     }
 
     if (player1.pos[0] === 3.7 && player1.pos[1] === -3 && player1.pos[2] === -40) {
-      alert("Game Over");
+      alert("Game Over! Score : " + score);
     }
 
     player1.pos[2] -= 0.25;
     cam_z -= 0.25;
 
+    if(tr1.collided == false){
     tr1.pos[2] += 2;
+    }
+    if(tr2.collided == false){
     tr2.pos[2] += 3;
+    }
     xp = player1.pos[0];
     yp = player1.pos[1];
     zp = player1.pos[2];
+
+    // checking for coin collisions
     coinloop = 0;
     while (coinloop < 10) {
 
 
       if (xp == 0 && yp == 1 && zp == -(2 + 5 * coinloop)) {
         coins[coinloop].taken = true;
-        //console.log("taken");
-        //console.log(coinloop);
+        score+=10; 
       }
       if (xp == -2.75 && yp == 1 && zp == -(100 + 5 * (coinloop))) {
         
         coins[coinloop + 10].taken = true;
-        console.log("taken");
-        console.log(coinloop);
+        score+=10;
+       
       }
       if (xp == 3.7 && yp == 1 && zp == -(150 + 5 * (coinloop))) {
 
         coins[coinloop + 30].taken = true;
-        console.log("taken");
-        console.log(coinloop);
+        score+=10;
+        
       }
       if (xp == 0 && yp == 1 && zp == -(250 + 5 * (coinloop))) {
 
         coins[coinloop + 60].taken = true;
-        console.log("taken");
-        console.log(coinloop);
+        score+=10;
+       
       }
       coinloop++;
     }
-    // coinloop1 = 0;
-    // while (coinloop1 < 10) {
-    //   //console.log(coins[coinloop+9].pos);
-    //   // console.log(-(100 + 5 * (coinloop1)));
-    //   if (xp == -2.7 && yp == 1 && zp == -(100 + 5 * (coinloop1))) {
-    //     alert("taken");
-    //     coins[coinloop1 + 9].taken = true;
-    //     console.log("taken");
-    //     console.log(coinloop);
-    //   }
-    //   coinloop1++;
-    // }
+    xp = player1.pos[0];
+    yp = player1.pos[1];
+    zp = player1.pos[2];
+    // checking for train collsions
+    if (xp == tr1.pos[0] && yp == tr1.pos[1] && zp == tr1.pos[2] + 0.25) {
+      alert("Game Over! Score : " + score);
+    }
+    if (xp == tr2.pos[0] && yp == tr2.pos[1] && zp == tr2.pos[2] + 0.25) {
+      alert("Game Over! Score : " + score);
+    }
+  
+    if (xp == 3.7 && yp == -3 && (zp - tr3.pos[2]) < 30.75) {
+      tr2.collided = true;
+      alert("Game Over! Score : " + score);
+    }
+    if (xp == 0 && yp == -3 && (zp - tr1.pos[2]) < 3.75) {
+      tr1.collided = true;
+      alert("Game Over! Score : " + score);
+    }
+
+    xp = player1.pos[0];
+    yp = player1.pos[1];
+    zp = player1.pos[2];
+    // checking for flying powerup collisions
+    var floop = 0;
+    while (floop < 4) {
+      if(xp == 0 && yp == -3 && zp == -(floop * 100 + 50))
+      {
+          inair = true;
+          fboost[floop].taken = true;
+      }
+      floop++;
+    }
+
 
 
     drawScene(gl, programInfo, deltaTime);
@@ -414,28 +454,25 @@ function drawScene(gl, programInfo, deltaTime) {
   }
   var j = 0;
   while (j < 100) {
-    //wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
   var j = 0;
   while (j < 1000) {
     wall_left[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
-    //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
   var j = 0;
   while (j < 3) {
     skull[j].drawSkull(gl, viewProjectionMatrix, programInfo, deltaTime);
-    //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
   var j = 0;
   while (j < 4) {
+    if(fboost[j].taken==false){
     fboost[j].drawFlyBoost(gl, viewProjectionMatrix, programInfo, deltaTime);
-    //console.log(fboost[j].pos)
-    //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
+    }
   }
   dog1.drawDog(gl, viewProjectionMatrix, programInfo, deltaTime);
 }

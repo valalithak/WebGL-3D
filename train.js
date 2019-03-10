@@ -4,7 +4,7 @@ let train = class {
     constructor(gl, pos) {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-
+        this.collided = false;
         this.positions = [
              // Front face
              -0.35, -0.35, 1.0,
