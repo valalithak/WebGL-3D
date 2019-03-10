@@ -18,6 +18,7 @@ var fly_count = 0;
 var train_texture;
 jump = false;
 var coinloop = 0;
+var dog_texture;
 
 var c_texture;
 var cam_x = 0, cam_y = 20, cam_z = 10;
@@ -39,6 +40,7 @@ function main() {
 
   c = new cube(gl, [2, 2, 4]);
   player1 = new player(gl, [0, -3, 0]);
+  dog1 = new dog(gl, [0, -3.5, -7]);
   track1 = new Array()
   coins = new Array()
   // coins
@@ -53,9 +55,6 @@ function main() {
   while (i < 20) {
     c = new coin(gl, [-2.7, 1, -(100 + 5 * i)]);
     coins.push(c);
-    console.log(i, "at");
-    console.log(c.pos);
-    //c.setAttribute('taken', 'false');
     i++;
   }
   var i = 0;
@@ -190,6 +189,7 @@ function main() {
   obs1_texture = loadTexture(gl, 'skull.png');
   fly_texture = loadTexture(gl, 'fly.jpg');
   train_texture = loadTexture(gl, 'train.jpeg');
+  dog_texture = loadTexture(gl, 'dog.jpg');
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
@@ -219,6 +219,8 @@ function main() {
     const deltaTime = now - then;
     then = now;
     console.log(player1.pos);
+    dog1.pos[0]  = player1.pos[0];
+    dog1.pos[2] = player1.pos[2] + 1;
 
     if (player1.pos[1] > -3 && jump == false) {
       player1.pos[1] -= 0.75;
@@ -435,6 +437,7 @@ function drawScene(gl, programInfo, deltaTime) {
     //wall_right[j].drawWall(gl, viewProjectionMatrix, programInfo, deltaTime);
     j++;
   }
+  dog1.drawDog(gl, viewProjectionMatrix, programInfo, deltaTime);
 }
 
 //
